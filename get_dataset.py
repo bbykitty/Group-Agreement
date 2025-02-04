@@ -43,6 +43,7 @@ def get_agreement(submissionDict):
             if (origin == "cards"):continue
             origin_answers = [0]*len(cards)
             for answer in submissionDict[group][origin]:
+                #If they submit cards, find the correct index and mark it
                 if(answer in cards):
                     origin_answers[cards.index(answer)] = 1
             submissions.append(origin_answers)
@@ -57,20 +58,24 @@ def save_to_csv(filename,header,groupDict,submissionDict,agreementDict):
         for key in groupDict.keys():
             writer.writerow([key,groupDict[key],submissionDict[key],agreementDict[key]])
 
+def plot_hist(agreementDict,filename):
+    agreement = []
+    for key in agreementDict.keys():
+        #If they all chose everything or nothing, krip gives a nan; make it a 1
+        if(agreementDict[key] != agreementDict[key]): 
+            agreement.append(1)
+            continue
+        agreement.append(agreementDict[key])
+    print(sum(agreement)/len(agreement))
+    plt.hist(agreement)
+    plt.savefig(filename) 
+
+#groupDict is the text, submissionDict is their answers
 groupDict, submissionDict = get_features()
+#agreementDict is their agreement scores
 agreementDict = get_agreement(submissionDict)
-agreement = []
-nan = 0
-for key in groupDict.keys():
-    if(agreementDict[key] != agreementDict[key]): 
-        agreement.append(1)
-        continue
-    agreement.append(agreementDict[key])
-    # print("Submissions: ",submissionDict[key], "Agreement: ",agreementDict[key])
-#     break
+plot_hist(agreementDict,'my_figure.png')
 # save_to_csv("all_groups_kripp.csv",["Group","Text","Submissions","Agreement"],groupDict,submissionDict,agreementDict)
-print(sum(agreement)/len(agreement))
-plt.hist(agreement)
-plt.savefig('my_figure.png') 
+
 
 
