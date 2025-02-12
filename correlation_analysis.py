@@ -4,6 +4,7 @@ import csv
 import re
 import pandas as pd
 import krippendorff
+from scipy.stats.stats import pearsonr
 import matplotlib.pyplot as plt
 delidata_corpus = load_dataset("gkaradzhov/DeliData")
 
@@ -26,13 +27,24 @@ def get_annotations(annotation,output):
 
     return itemDict
 
-def scatter(x,y,filename):
+def scatter(x,y,filename,xname,yname):
     plt.scatter(x,y)
+    plt.xlabel(xname)
+    plt.ylabel(yname)
     plt.savefig(filename) 
 
+df = pd.read_csv("all_groups_kripp.csv")
+df = df.reset_index()
 
+x = []
+y = []
 itemDict = get_annotations("Disagree","team_performance")
-print(itemDict)
+for index, row in df.iterrows():
+    # y.append(row["Agreement"])
+    y.append(itemDict[row['Group']][1])
+    x.append(itemDict[row['Group']][0])
+# scatter(x,y,"Disagree_perform_corr.png","Disagreements","Performance")
+print(pearsonr(x,y))
 
 
 

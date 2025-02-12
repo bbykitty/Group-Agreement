@@ -47,7 +47,9 @@ def get_agreement(submissionDict):
                 if(answer in cards):
                     origin_answers[cards.index(answer)] = 1
             submissions.append(origin_answers)
-        agreementDict[group] = krippendorff.alpha(reliability_data = submissions,level_of_measurement="nominal",value_domain=[0,1])
+        alpha = krippendorff.alpha(reliability_data = submissions,level_of_measurement="nominal",value_domain=[0,1])
+        if(alpha <= 0):
+            agreementDict[group] = krippendorff.alpha(reliability_data = submissions,level_of_measurement="nominal",value_domain=[0,1])
     return agreementDict
 
 def save_to_csv(filename,header,groupDict,submissionDict,agreementDict):
@@ -55,7 +57,7 @@ def save_to_csv(filename,header,groupDict,submissionDict,agreementDict):
         writer = csv.writer(file)
         if header:
             writer.writerow(header)
-        for key in groupDict.keys():
+        for key in agreementDict.keys():
             writer.writerow([key,groupDict[key],submissionDict[key],agreementDict[key]])
 
 def plot_hist(agreementDict,filename):
@@ -74,8 +76,8 @@ def plot_hist(agreementDict,filename):
 groupDict, submissionDict = get_features()
 #agreementDict is their agreement scores
 agreementDict = get_agreement(submissionDict)
-plot_hist(agreementDict,'my_figure.png')
-# save_to_csv("all_groups_kripp.csv",["Group","Text","Submissions","Agreement"],groupDict,submissionDict,agreementDict)
+plot_hist(agreementDict,'disagreements_hist.png')
+save_to_csv("all_negative_kripp.csv",["Group","Text","Submissions","Agreement"],groupDict,submissionDict,agreementDict)
 
 
 
